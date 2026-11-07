@@ -7,7 +7,7 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /build/target/signalforge-1.0.0.jar /app/app.jar
 COPY --from=build /build/target/lib /app/lib
-RUN mkdir /data && chown 10001 /data
+RUN useradd --create-home --uid 10001 signalforge && mkdir /data && chown 10001 /data
 USER 10001
 ENV SPARK_LOCAL_IP=127.0.0.1
 ENTRYPOINT ["java","-Xmx1200m","--add-exports=java.base/sun.nio.ch=ALL-UNNAMED","--add-opens=java.base/java.nio=ALL-UNNAMED","--add-opens=java.base/java.lang.invoke=ALL-UNNAMED","-cp","/app/app.jar:/app/lib/*"]
