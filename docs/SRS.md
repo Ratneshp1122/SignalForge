@@ -8,7 +8,7 @@ Version 1.0 | 7 November 2026 | Prepared for Ratnesh P
 
 SignalForge reconstructs the delivery history of messages from unreliable provider callbacks. It accepts duplicate, delayed, malformed, and out-of-order events, produces a deterministic lifecycle for each message attempt, and publishes delivery analytics by tenant, channel, market, and event-time window. The engineering problem is preserving correct outcomes through retries and recovery while keeping processing bounded.
 
-This document specifies a proposed implementation for the project described in your resume. It is a build specification, not a report that the system or its benchmarks has been reproduced. The 35,000 events/second, 100 million events, and 475 GB figures are separate evaluation targets. Achieving one does not establish the others. The current accessible GitHub search did not return a SignalForge repository; existing local code can be mapped to these requirements when available.
+This document specifies the broader target design. The repository README and CLAIMS.md describe the implemented subset, and VALIDATION.md links executed tests. The 35,000 events/second, 100 million events, and 475 GB figures are separate evaluation targets. Achieving one does not establish the others. Proposed ingestion/query services and distributed deployment extensions below are roadmap items, not assertions of current implementation.
 
 ### Product boundaries
 
