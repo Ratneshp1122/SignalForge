@@ -81,7 +81,7 @@ SF-N06 maintainability: version contracts, migrations, replay logic, and benchma
 
 ## 4 Architecture and deployment
 
-[[ARCHITECTURE]]
+See the [component diagram](architecture/signalforge-containers.mmd), [processing sequence](architecture/signalforge-sequence.mmd), and [deployment diagram](architecture/signalforge-deployment.mmd). These diagrams describe the broader target design; the repository README documents the implemented runtime.
 
 The raw event log is the replay input. The canonical database is the query source for the initial implementation. Parquet is a separately reconciled archive. The first design favors transparent correctness over maximum throughput; large-scale storage changes come after measurement.
 
