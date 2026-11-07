@@ -1,0 +1,21 @@
+flowchart TB
+  subgraph Laptop_8GB
+    G[Small generator]
+    K[Single Kafka broker]
+    S[Spark local 2 threads]
+    P[(PostgreSQL)]
+    D[Measured disk budget]
+    G-->K-->S-->P
+    K-->D
+    S-->D
+    P-->D
+  end
+  subgraph Separate_Performance_Lab
+    LG[Independent load host]
+    KB[Three brokers with replication]
+    SE[Explicit Spark executor resources]
+    DB[(Protected database)]
+    ST[Durable checkpoints and archive]
+    LG-->KB-->SE-->DB
+    SE-->ST
+  end

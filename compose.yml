@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: signalforge
+      POSTGRES_USER: signalforge
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-local-development-only}
+    ports: ["127.0.0.1:5433:5432"]
+    volumes: ["postgres:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U signalforge"]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+  kafka:
+    image: apache/kafka:3.9.1
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_HEAP_OPTS: -Xmx384m -Xms256m
+    volumes: ["kafka:/var/lib/kafka/data"]
+  topics:
+    image: apache/kafka:3.9.1
+    depends_on: [kafka]
+    entrypoint: ["/bin/bash", "-ec"]
+    command: ["until /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists --topic signalforge.raw.v1 --partitions 4 --replication-factor 1; do sleep 2; done"]
+  stream:
+    build: .
+    environment: &runtime
+      DB_URL: jdbc:postgresql://postgres:5432/signalforge
+      DB_PASSWORD: ${DB_PASSWORD:-local-development-only}
+      KAFKA_BOOTSTRAP: kafka:9092
+      CHECKPOINT: /data/checkpoint
+      ARCHIVE: /data/archive
+      MAX_OFFSETS: ${MAX_OFFSETS:-20000}
+    volumes: ["stream:/data"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      topics: {condition: service_completed_successfully}
+    mem_limit: 2g
+  generator:
+    build: .
+    profiles: [tools]
+    command: ["dev.ratnesh.signalforge.Generator"]
+    environment:
+      <<: *runtime
+      EVENTS: ${EVENTS:-10000}
+      RATE: ${RATE:-1000}
+      PADDING: ${PADDING:-0}
+      RUN_ID: ${RUN_ID:-demo-v1}
+  inspect:
+    build: .
+    profiles: [tools]
+    command: ["dev.ratnesh.signalforge.Inspect"]
+    environment: *runtime
+volumes:
+  postgres:
+  kafka:
+  stream:

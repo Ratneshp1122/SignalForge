@@ -1,0 +1,19 @@
+sequenceDiagram
+  participant C as Producer
+  participant I as Ingress
+  participant K as Kafka
+  participant S as Spark task
+  participant D as PostgreSQL
+  participant CP as Checkpoint
+  C->>I: Valid event with stable identity
+  I->>K: Append raw event
+  K-->>I: Configured durable acknowledgement
+  I-->>C: 202 accepted
+  K->>S: Raw record with partition and offset
+  S->>D: Begin bounded chunk; lock attempt
+  S->>D: Insert unique event; update projection; receipt
+  D-->>S: Commit
+  Note over S,CP: A crash here causes replay
+  S->>CP: Successful batch progress
+  K->>S: Redeliver after failure
+  S->>D: Duplicate identity and receipt suppress effects

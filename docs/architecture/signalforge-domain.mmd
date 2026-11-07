@@ -1,0 +1,28 @@
+erDiagram
+  MESSAGE_ATTEMPT ||--o{ CANONICAL_EVENT : reconstructed_from
+  CANONICAL_EVENT ||--o{ SOURCE_RECEIPT : observed_as
+  SOURCE_RECEIPT ||--o| QUARANTINE : may_classify
+  CANONICAL_EVENT ||--o{ EVENT_CONFLICT : may_conflict
+  REPLAY_RUN ||--o{ SOURCE_RECEIPT : processes
+  CANONICAL_EVENT }o--o{ WINDOW_SNAPSHOT : contributes_to
+  ARCHIVE_MANIFEST }o--o{ CANONICAL_EVENT : covers
+  MESSAGE_ATTEMPT {
+    string tenant_id PK
+    string message_id PK
+    string attempt_id PK
+    string outcome
+    bigint revision
+  }
+  CANONICAL_EVENT {
+    string tenant_id PK
+    string provider PK
+    string event_id PK
+    string payload_hash
+    timestamp event_time
+  }
+  SOURCE_RECEIPT {
+    string topic PK
+    int partition_id PK
+    bigint offset_id PK
+    string classification
+  }

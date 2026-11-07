@@ -1,0 +1,11 @@
+flowchart LR
+  G[Seeded generator and oracle] --> I[Authenticated ingress]
+  I -->|202 only after ack| K[Kafka raw log]
+  K --> S[Spark validation and canonical writer]
+  S -->|idempotent transactions| P[(PostgreSQL facts and projections)]
+  S -->|invalid records in same durable model| Q[(Quarantine and source receipts)]
+  P --> A[Analytics and query API]
+  P --> E[Bounded archive exporter]
+  E --> F[Parquet files and committed manifests]
+  G -. reconcile expected results .-> P
+  K -. bounded replay in new namespace .-> S
