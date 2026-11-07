@@ -11,3 +11,5 @@ On 7 November 2026, [CI run 42373567714](https://github.com/Ratneshp1122/SignalF
 - An independent Spark read of published Parquet directories asserted exactly 300 rows and 300 unique identities for the run.
 
 This is correctness evidence for a small workload. It does not establish 35,000 sustained events/sec, 100M processed events, 475GB of traffic, high availability, or production deployment readiness. Inspect subsequent CI runs for later commit validation; formatting/documentation changes do not alter the measured run's commit identity.
+
+The formatted sources and expanded audit logging at commit `c6c992b` also passed [CI run 42373872195](https://github.com/Ratneshp1122/SignalForge/actions/runs/42373872195).

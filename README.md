@@ -84,3 +84,5 @@ The default JDBC implementation performs several round trips per event and is a 
 6. Add entropy-aware generators, richer expected-outcome oracles, tenant authentication at an ingress service, TLS, and production observability before public deployment.
 
 The local Kafka/database network is a trusted lab boundary. There is no public ingestion HTTP API or production multi-tenant authorization layer in this implementation. See [SRS](docs/SRS.md) for the broader design, and [claim map](docs/CLAIMS.md) for exact scope.
+
+[Executed validation](docs/VALIDATION.md) links the passing database and full Docker/Parquet recovery tests, including exact input and canonical-output counts.
