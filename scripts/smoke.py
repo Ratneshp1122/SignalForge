@@ -21,5 +21,7 @@ generate()
 time.sleep(10)
 assert sql(f"SELECT count(*) FROM event WHERE tenant='{run}'")=='300'
 assert sql(f"SELECT count(*) FROM lifecycle WHERE tenant='{run}' AND status='DELIVERED'")=='100'
-assert 'lag=0' in compose('run','--rm','inspect')
+lags=[line for line in compose('run','--rm','inspect').splitlines() if line.startswith('partition=')]
+assert len(lags)==4 and all(line.endswith('lag=0') for line in lags),lags
+compose('run','--rm','-e','RUN_ID='+run,'-e','EXPECTED_UNIQUE=300','audit')
 print(json.dumps({'smoke':'passed','runId':run,'rawEvents':800,'uniqueEvents':300,'deliveredLifecycles':100,'checks':['deduplication','out-of-order lifecycle','archive publication','SIGKILL checkpoint restart']}))

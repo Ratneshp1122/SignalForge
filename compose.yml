@@ -61,6 +61,12 @@ services:
     profiles: [tools]
     command: ["dev.ratnesh.signalforge.Inspect"]
     environment: *runtime
+  audit:
+    build: .
+    profiles: [tools]
+    command: ["dev.ratnesh.signalforge.ArchiveAudit"]
+    environment: *runtime
+    volumes: ["stream:/data:ro"]
 volumes:
   postgres:
   kafka:
