@@ -1,0 +1,80 @@
+[INFO] Scanning for projects...
+[INFO] Loaded 24408 auto-discovered prefixes for remote repository central (prefixes-central.txt)
+[INFO] 
+[INFO] ----------------------< dev.ratnesh:signalforge >-----------------------
+[INFO] Building signalforge 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] Loaded 64 auto-discovered prefixes for remote repository apache.snapshots (prefixes-apache.snapshots.txt)
+[INFO] Loaded 24406 auto-discovered prefixes for remote repository gcs-maven-central-mirror (prefixes-gcs-maven-central-mirror.txt)
+[WARNING] 2 problems were encountered while building the effective model for org.apache.yetus:audience-annotations:jar:0.5.0 during dependency collection step for project (use -X to see details)
+[INFO] Loaded 64 auto-discovered prefixes for remote repository apache.snapshots.https (prefixes-apache.snapshots.https.txt)
+[INFO] Loaded 24408 auto-discovered prefixes for remote repository sonatype-releases (prefixes-sonatype-releases.txt)
+[INFO] Loaded 24408 auto-discovered prefixes for remote repository maven-central-repository (prefixes-maven-central-repository.txt)
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ signalforge ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ signalforge ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 8 source files with javac [debug release 17] to target/classes
+[INFO] 
+[INFO] --- exec:3.5.0:java (default-cli) @ signalforge ---
+[INFO] Loaded 50 auto-discovered prefixes for remote repository ow2-snapshot (prefixes-ow2-snapshot.txt)
+{
+  "trial" : 1,
+  "mode" : "row",
+  "commit" : "f3c6c2e8c775e72358e3da415c39767d92bd18ed",
+  "timestamp" : "2026-11-08T06:59:37.314229733Z",
+  "rawEvents" : 20000,
+  "canonicalEvents" : 15000,
+  "deliveredLifecycles" : 5000,
+  "seconds" : 10.696394216,
+  "rawEventsPerSecond" : 1869.7889771193527,
+  "canonicalEventsPerSecond" : 1402.3417328395144,
+  "batchSize" : 250,
+  "correct" : true,
+  "scope" : "single JDBC writer including JSON parsing, excluding Kafka Spark and Parquet",
+  "java" : "17.0.21",
+  "availableProcessors" : 4
+}
+{
+  "trial" : 2,
+  "mode" : "row",
+  "commit" : "f3c6c2e8c775e72358e3da415c39767d92bd18ed",
+  "timestamp" : "2026-11-08T06:59:47.843265838Z",
+  "rawEvents" : 20000,
+  "canonicalEvents" : 15000,
+  "deliveredLifecycles" : 5000,
+  "seconds" : 10.505400351,
+  "rawEventsPerSecond" : 1903.7827528482735,
+  "canonicalEventsPerSecond" : 1427.8370646362052,
+  "batchSize" : 250,
+  "correct" : true,
+  "scope" : "single JDBC writer including JSON parsing, excluding Kafka Spark and Parquet",
+  "java" : "17.0.21",
+  "availableProcessors" : 4
+}
+{
+  "trial" : 3,
+  "mode" : "row",
+  "commit" : "f3c6c2e8c775e72358e3da415c39767d92bd18ed",
+  "timestamp" : "2026-11-08T06:59:57.924090777Z",
+  "rawEvents" : 20000,
+  "canonicalEvents" : 15000,
+  "deliveredLifecycles" : 5000,
+  "seconds" : 10.074464833,
+  "rawEventsPerSecond" : 1985.2171139143625,
+  "canonicalEventsPerSecond" : 1488.9128354357717,
+  "batchSize" : 250,
+  "correct" : true,
+  "scope" : "single JDBC writer including JSON parsing, excluding Kafka Spark and Parquet",
+  "java" : "17.0.21",
+  "availableProcessors" : 4
+}
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  39.740 s
+[INFO] Finished at: 2026-11-08T06:59:57Z
+[INFO] ------------------------------------------------------------------------
