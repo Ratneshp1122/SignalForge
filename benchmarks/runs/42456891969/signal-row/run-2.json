@@ -1,0 +1,17 @@
+{
+  "trial" : 2,
+  "mode" : "row",
+  "commit" : "f3c6c2e8c775e72358e3da415c39767d92bd18ed",
+  "timestamp" : "2026-11-08T06:59:47.843265838Z",
+  "rawEvents" : 20000,
+  "canonicalEvents" : 15000,
+  "deliveredLifecycles" : 5000,
+  "seconds" : 10.505400351,
+  "rawEventsPerSecond" : 1903.7827528482735,
+  "canonicalEventsPerSecond" : 1427.8370646362052,
+  "batchSize" : 250,
+  "correct" : true,
+  "scope" : "single JDBC writer including JSON parsing, excluding Kafka Spark and Parquet",
+  "java" : "17.0.21",
+  "availableProcessors" : 4
+}
