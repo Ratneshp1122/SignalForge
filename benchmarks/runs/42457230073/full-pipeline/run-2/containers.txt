@@ -1,0 +1,4 @@
+CONTAINER ID   NAME                     CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O     PIDS
+f40b79b3daf7   signalforge-stream-1     0.20%     704MiB / 2GiB         34.37%    53.7MB / 113MB    0B / 3.73MB   271
+622ab834da37   signalforge-postgres-1   2.98%     165.2MiB / 15.61GiB   1.03%     113MB / 44.1MB    0B / 777MB    6
+786c06c26505   signalforge-kafka-1      1.18%     397.5MiB / 15.61GiB   2.49%     10.3MB / 10.7MB   0B / 11.5MB   99

@@ -1,0 +1,24 @@
+{
+  "trial": 2,
+  "commit": "11df10728911a690d5a4e177dbe4aa4060ff59ec",
+  "rawEvents": 100000,
+  "canonicalEvents": 75000,
+  "logicalPayloadBytes": 25557120,
+  "secondsToAllSinksAndZeroLag": 23.273256056999998,
+  "processedRawEventsPerSecond": 4296.777372065331,
+  "canonicalEventsPerSecond": 3222.5830290489985,
+  "correct": true,
+  "requestedGeneratorRate": 10000,
+  "scope": "generator process launch through PostgreSQL + Parquet publication + zero lag; actual Parquet audit follows timed interval",
+  "generator": {
+    "expectedLifecycles": 25000,
+    "errors": 0,
+    "runId": "pipeline-6df25b4b-6339-4b93-ba85-c8c3951abf22",
+    "acknowledged": 100000,
+    "payloadBytes": 25557120,
+    "requested": 100000,
+    "expectedUniqueEvents": 75000,
+    "seconds": 10.009439778,
+    "targetRate": 10000
+  }
+}

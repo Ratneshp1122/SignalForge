@@ -1,0 +1,28 @@
+event=225300
+lifecycle=75100
+quarantine=0
+archive_batch=34
+window=2026-01-01 00:04:00.0 channel=SMS market=US delivered=333
+window=2026-01-01 00:04:00.0 channel=EMAIL market=IN delivered=167
+window=2026-01-01 00:04:00.0 channel=EMAIL market=US delivered=333
+window=2026-01-01 00:04:00.0 channel=SMS market=IN delivered=167
+window=2026-01-01 00:04:00.0 channel=EMAIL market=US delivered=333
+window=2026-01-01 00:04:00.0 channel=EMAIL market=US delivered=333
+window=2026-01-01 00:04:00.0 channel=EMAIL market=IN delivered=167
+window=2026-01-01 00:04:00.0 channel=EMAIL market=IN delivered=167
+window=2026-01-01 00:04:00.0 channel=SMS market=IN delivered=167
+window=2026-01-01 00:04:00.0 channel=SMS market=US delivered=333
+window=2026-01-01 00:04:00.0 channel=SMS market=US delivered=333
+window=2026-01-01 00:04:00.0 channel=SMS market=IN delivered=167
+window=2026-01-01 00:03:00.0 channel=SMS market=IN delivered=1000
+window=2026-01-01 00:03:00.0 channel=EMAIL market=US delivered=2000
+window=2026-01-01 00:03:00.0 channel=EMAIL market=US delivered=2000
+window=2026-01-01 00:03:00.0 channel=EMAIL market=IN delivered=1000
+window=2026-01-01 00:03:00.0 channel=EMAIL market=IN delivered=1000
+window=2026-01-01 00:03:00.0 channel=SMS market=IN delivered=1000
+window=2026-01-01 00:03:00.0 channel=SMS market=IN delivered=1000
+window=2026-01-01 00:03:00.0 channel=EMAIL market=IN delivered=1000
+partition=3 lag=0
+partition=2 lag=0
+partition=1 lag=0
+partition=0 lag=0
