@@ -46,7 +46,9 @@ flowchart LR
   Archive --> Parquet[Atomic named Parquet directories]
 ```
 
-Spark reads Kafka metadata/raw values and writes bounded JDBC chunks per input partition. Each chunk commits canonical facts, lifecycle changes, quarantine, and source progress together. A task failure after a partial chunk commit is safe to replay because canonical identities and quarantine source coordinates are unique. Lifecycle writes are serialized by transaction advisory locks.
+Spark reads Kafka metadata/raw values and uses PostgreSQL COPY into temporary staging tables, followed by set-based SQL per input partition. Each transaction commits canonical facts, lifecycle changes, quarantine, and source progress together. `COPY_BATCH_SIZE` defaults to 250 (maximum 1000); chunks also flush after approximately two million raw characters. A failed task can replay committed chunks safely. Event and lifecycle advisory locks are acquired in a globally sorted order. Stop older row-at-a-time writers before rolling out this lock protocol.
+
+When an identity or lifecycle has conflicting new variants within a batch, all conflicting variants are quarantined. For identities already committed, matching replays deduplicate and changed variants quarantine. This deliberately avoids selecting an arbitrary first variant from an unordered batch.
 
 The archive claims unarchived canonical events into a durable named batch. Spark writes a staging Parquet directory, then publishes it through an atomic rename on the same local filesystem. On restart, an existing `_SUCCESS` in the final directory is recognized before marking the batch published. PostgreSQL and Parquet are **not one distributed atomic transaction**. Pending archive work is drained before the Spark batch completes. Do not delete checkpoints or archive files independently. The atomic-rename protocol targets a single-host local filesystem, not arbitrary object storage.
 
@@ -72,12 +74,21 @@ docker compose run --rm -e RUN_ID=large-001 -e EVENTS=100000000 -e RATE=35000 -e
 
 This is an opt-in large run; do not run it on the 8GB laptop without sufficient storage and monitoring. 100M / 35k takes at least 47.6 minutes of input. Payload padding changes exact serialized byte counts; use the generator's `payloadBytes`, not an assumed 475GB. Repeated `x` padding compresses strongly, so logical payload bytes are not physical storage consumption or realistic production entropy. The fourth callback in each four-callback group repeats SENT: 100M generated callbacks yield 75M canonical events and 25M lifecycles. The generator uses fixed timestamps and deterministic IDs, making results reproducible and replayable.
 
-The default JDBC implementation performs several round trips per event and is a correctness baseline, **not an implementation already known to sustain 35k/sec**. For each run record the SHA, hardware, limits, payload distribution, raw Kafka counters, database counts, archive counts, disk bytes, timing series, and errors. Fill [run template](benchmarks/run-template.json) with actual evidence. Preserve generator JSON, Spark logs, `inspect` output during and after input, and `docker stats`. Wait for all partitions and archive work to drain before calculating completion throughput.
+The COPY implementation has two separate measurements on GitHub-hosted runners:
+
+| Measurement | Trial 1 | Trial 2 | Trial 3 |
+|---|---:|---:|---:|
+| Previous row-at-a-time sink, raw callbacks/s | 1,870 | 1,904 | 1,985 |
+| COPY sink only, raw callbacks/s | 9,399 | 10,303 | 11,577 |
+| Full pipeline, raw callbacks/s | 3,880 | 4,297 | 4,599 |
+| Full pipeline, canonical events/s | 2,910 | 3,223 | 3,449 |
+
+The [sink comparison](benchmarks/runs/42456891969/README.md) uses 20k callbacks per trial and excludes Kafka, Spark, and Parquet. The [full-pipeline trials](benchmarks/runs/42457230073/full-pipeline/README.md) each use 100k callbacks (75k canonical events), count completion through archive publication and zero partition lag, then audit Parquet contents. These are short hosted-runner measurements, not 8GB-laptop, sustained 35k/s, or 100M-event proof. Each workflow archives commit, hardware, raw results and tables, including failures. Run `benchmark.yml` and `pipeline-benchmark.yml` through Actions to repeat them.
 
 ## Improvement path
 
-1. Profile before tuning: SQL round trips and per-message advisory locks are likely the first bottleneck.
-2. Replace row-at-a-time JDBC with COPY into staging plus a set-based transaction that preserves identity conflicts, lifecycle evidence, and source progress.
+1. Profile the full pipeline: the sink-only gain does not establish a matching end-to-end gain.
+2. Tune COPY batch size within the bounded memory and lock limits; retain conflict, rollback, replay, and concurrent-batch tests.
 3. Size Kafka partitions and Spark executor concurrency to available database IOPS; preserve message-key partition affinity.
 4. Batch archive publication into larger files and run a separately managed exporter if synchronous draining becomes the bottleneck; retain manifests and restart tests.
 5. Partition/retain canonical data only with a documented durable deduplication horizon. Do not silently lose correctness by adding a short watermark.
