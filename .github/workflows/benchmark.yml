@@ -1,0 +1,67 @@
+name: Three-run sink comparison
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [row, copy]
+    services:
+      postgres:
+        image: postgres:17.6-alpine
+        env: {POSTGRES_DB: signalforge, POSTGRES_USER: signalforge, POSTGRES_PASSWORD: benchmark-only}
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U signalforge" --health-interval 3s --health-retries 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: harness}
+      - uses: actions/checkout@v4
+        with:
+          path: tested
+          ref: ${{ matrix.mode == 'row' && 'f3c6c2e8c775e72358e3da415c39767d92bd18ed' || github.sha }}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17', cache: maven, cache-dependency-path: tested/pom.xml}
+      - name: Record environment and run three trials
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/signalforge
+          DB_PASSWORD: benchmark-only
+          REPORT_DIR: ${{ github.workspace }}/evidence
+        run: |
+          mkdir -p evidence
+          lscpu > evidence/cpu.txt
+          free -h > evidence/memory.txt
+          uname -a > evidence/kernel.txt
+          git -C tested rev-parse HEAD > evidence/commit.txt
+          export BENCHMARK_REVISION=$(cat evidence/commit.txt)
+          cp harness/src/main/java/dev/ratnesh/signalforge/JdbcBenchmark.java tested/src/main/java/dev/ratnesh/signalforge/
+          cd tested
+          mvn -B -ntp -DskipTests compile exec:java -Dexec.mainClass=dev.ratnesh.signalforge.JdbcBenchmark 2>&1 | tee ../evidence/build-and-run.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: signal-${{ matrix.mode }}
+          path: evidence/
+  archive:
+    needs: measure
+    if: always()
+    runs-on: ubuntu-latest
+    permissions: {contents: write, actions: read}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: benchmarks/runs/${{ github.run_id }}
+      - name: Commit all run evidence
+        env: {RUN_ID: '${{ github.run_id }}'}
+        run: |
+          python3 scripts/summarize-runs.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add benchmarks/runs
+          git commit -m "Record sink comparison $RUN_ID [skip ci]"
+          for attempt in 1 2 3; do git pull --rebase origin main && git push && exit 0; sleep 2; done
+          exit 1
