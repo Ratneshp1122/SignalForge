@@ -1,4 +1,9 @@
 CREATE TABLE IF NOT EXISTS archive_batch(id uuid PRIMARY KEY,state text NOT NULL DEFAULT 'PENDING',created_at timestamptz NOT NULL DEFAULT now());
+CREATE OR REPLACE FUNCTION sf_lifecycle_state(bits integer) RETURNS text LANGUAGE sql IMMUTABLE AS $$
+ SELECT CASE WHEN ((bits&4)>0)::int+((bits&8)>0)::int+((bits&16)>0)::int>1 THEN 'CONFLICT'
+ WHEN (bits&4)>0 THEN 'DELIVERED' WHEN (bits&8)>0 THEN 'FAILED' WHEN (bits&16)>0 THEN 'EXPIRED'
+ WHEN (bits&2)>0 THEN 'SENT' ELSE 'QUEUED' END
+$$;
 CREATE TABLE IF NOT EXISTS event(
  tenant text NOT NULL,provider text NOT NULL,event_id text NOT NULL,message_id text NOT NULL,attempt int NOT NULL,
  kind text NOT NULL,event_time timestamptz NOT NULL,channel text NOT NULL,market text NOT NULL,hash text NOT NULL,payload text NOT NULL,

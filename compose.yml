@@ -41,6 +41,7 @@ services:
       CHECKPOINT: /data/checkpoint
       ARCHIVE: /data/archive
       MAX_OFFSETS: ${MAX_OFFSETS:-20000}
+      COPY_BATCH_SIZE: ${COPY_BATCH_SIZE:-250}
     volumes: ["stream:/data"]
     depends_on:
       postgres: {condition: service_healthy}

@@ -68,7 +68,8 @@ public record Event(
   static String text(JsonNode n, String key) {
     if (!n.path(key).isTextual()
         || n.path(key).asText().isBlank()
-        || n.path(key).asText().length() > 128) throw new IllegalArgumentException(key);
+        || n.path(key).asText().length() > 128
+        || n.path(key).asText().indexOf('\0') >= 0) throw new IllegalArgumentException(key);
     return n.path(key).asText();
   }
 

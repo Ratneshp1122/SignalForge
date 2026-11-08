@@ -1,5 +1,6 @@
 package dev.ratnesh.signalforge;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import org.apache.spark.api.java.function.*;
 import org.apache.spark.sql.*;
@@ -53,13 +54,26 @@ public class StreamingJob {
   public static void writePartition(Iterator<Row> rows) throws Exception {
     try (Store store = Store.environment()) {
       store.db.setAutoCommit(false);
-      int n = 0;
+      int batchSize = Integer.parseInt(Store.env("COPY_BATCH_SIZE", "250"));
+      if (batchSize < 1 || batchSize > 1000)
+        throw new IllegalArgumentException("COPY_BATCH_SIZE must be 1..1000");
+      var chunk = new ArrayList<CopyWriter.SourceRecord>(batchSize);
+      long chars = 0;
       try {
         while (rows.hasNext()) {
           Row r = rows.next();
-          store.ingest(r.getString(0), r.getInt(1), r.getLong(2), r.getString(3));
-          if (++n % 250 == 0) store.db.commit();
+          String payload = r.getString(3);
+          chunk.add(
+              new CopyWriter.SourceRecord(r.getString(0), r.getInt(1), r.getLong(2), payload));
+          chars += payload == null ? 0 : payload.length();
+          if (chunk.size() >= batchSize || chars >= 2_000_000) {
+            store.ingestBatch(chunk);
+            store.db.commit();
+            chunk.clear();
+            chars = 0;
+          }
         }
+        if (!chunk.isEmpty()) store.ingestBatch(chunk);
         store.db.commit();
       } catch (Exception e) {
         store.db.rollback();
